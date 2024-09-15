@@ -1,6 +1,8 @@
 # Botcity
 
-##  Construindo o primeiro bot Desktop
+Exemplo de automação desktop utilizando o programa "Sicalc" para preencher o formulário e gerar um DARF e salvar como .PDF
+
+##  Bot Desktop
  
 ### Preparação do ambiente
 
