@@ -11,6 +11,11 @@ from botcity.plugins.excel import BotExcelPlugin
 # Importar biblioteca para manipular diretórios
 from pathlib import Path
 
+# bibliotecas para imagem
+import cv2
+import pytesseract
+from PIL import Image
+ 
 
 #from botcity.core import DesktopBot
 #from botcity.maestro import *
@@ -18,131 +23,128 @@ from random import *
 
 # Disable errors if we are not connected to Maestro
 BotMaestroSDK.RAISE_NOT_CONNECTED = False
+ 
 
-    
+# links uteis:
+# corrigir instalação windows: https://stackoverflow.com/questions/50951955/pytesseract-tesseractnotfound-error-tesseract-is-not-installed-or-its-not-i
+# instalar outra língua: https://github.com/tesseract-ocr/tessdata
+# pegar linguas: print(pytesseract.get_languages())
+ 
+# Variaveis  
+
+# PETR4 ######################  
+acao1 = "PETR4"
+x = 125  # linha
+y = 145  # coluna
+                    # 3614
+acao1_valor_compra = "3510"
+acao1_valor_venda = "3710"
+
+# VALE3 ######################  
+acao2 = "VALE3"
+x = 125  
+y = 145
+acao2_valor_compra = "6000"
+acao2_valor_venda = "6500"
+##############################
+
+
+
 def main():
     try:
-
+ 
         bot = DesktopBot()
-    
-        dir_exec_app = r"C:\\Program Files (x86)\\Programas RFB\\Sicalc Auto Atendimento\\SicalcAA.exe"
         
-    ###
-        # Abrir o SiCalc
+        # Abrir o programa
+        dir_exec_app = r"C:\\Program Files\\Clear Investimentos MT5 Terminal\\terminal64.exe"
         bot.execute(dir_exec_app)
- 
+        
         # Identificando o PID do processo do App no Windows
-        app_windows_process = bot.find_process("SicalcAA")
-    ###
+        app_windows_process = bot.find_process("terminal64.exe")
+        
+###################################################################################################
  
-        #Em seguida, precisamos fechar a janela de esclarecimento
-        if not bot.find( "btn_continuar1", matching=0.97, waiting_time=10000):
-            not_found("btn_continuar1")
-        bot.click()
-    
-        # Clicar em Continuar   
-        if not bot.find( "btn_Continuar2", matching=0.97, waiting_time=10000):
-            not_found("btn_Continuar2")
-        bot.click()
-    
-        # Identificando o menu funções para abrir o preenchimento da DARF
-        if not bot.find("menu_funcoes", matching=0.97, waiting_time=10000):
-            not_found("menu_funcoes")
+        if not bot.find( "petr4", matching=0.97, waiting_time=10000):
+            not_found("petr4")
         bot.click()
         
-        if not bot.find("menu_preenchimento_darf", matching=0.97, waiting_time=10000):
-            not_found("menu_preenchimento_darf")
-        bot.click()
+        if not bot.find( "Petr4-click", matching=0.97, waiting_time=10000):
+            not_found("Petr4-click")
         
-        # Neste momento, identificamos campo Cod Receita e vamos preencher com o valor
-        if not bot.find("item_codigo_receita", matching=0.97, waiting_time=10000):
-            not_found("item_codigo_receita")
-        bot.click_relative(149, 9)    
-        bot.paste("5629")
+                # # To get the mouse coordinate.
+                # xx = bot.get_last_x()
+                # yy = bot.get_last_y()
 
-        # Precisamos pressionar tab para avançar e considerar um tempo para evitar erros
-        bot.tab(wait = 1000)
-        
-        # Vamos começar a preencher os demais dados
-        if not bot.find("item_periodo_apuracao", matching=0.97, waiting_time=10000):
-            not_found("item_periodo_apuracao")
-        bot.click_relative(12, 22)
-        bot.paste("040121")
-
-        if not bot.find("item_valor_reais", matching=0.97, waiting_time=10000):
-            not_found("item_valor_reais")
-        bot.click_relative(18, 26)
-        bot.paste("1525")
-        
-        # Solicitando para calcular e gerar a DARF
-        if not bot.find("botao_calcular", matching=0.97, waiting_time=10000):
-            not_found("botao_calcular")
-        bot.click()
-        
-        if not bot.find("botao_darf", matching=0.97, waiting_time=10000):
-            not_found("botao_darf")
-        bot.click()
-        
-        # Finaliza o preenchimento dos campos
-        if not bot.find("item_nome", matching=0.97, waiting_time=10000):
-            not_found("item_nome")
-        bot.click_relative(22, 26)
-        bot.paste("Petrobras")
-        
-        if not bot.find("item_telefone", matching=0.97, waiting_time=10000):
-            not_found("item_telefone")
-        bot.click_relative(13, 29)
-        bot.paste("1199991234")
-        
-        if not bot.find("item_cnpj", matching=0.97, waiting_time=10000):
-            not_found("item_cnpj")
-        bot.click_relative(131, 10)
-        bot.paste("33000167000101")
-        
-        if not bot.find("item_referencia", matching=0.97, waiting_time=10000):
-            not_found("item_referencia")
-        bot.click_relative(134, 11)
-        bot.paste("0")
-
-        # Começa o processo para salvar o PDF
-        if not bot.find("botao_imprimir", matching=0.97, waiting_time=10000):
-            not_found("botao_imprimir")
-        bot.click()
-        
-        if not bot.find( "lbl_NomeArq", matching=0.97, waiting_time=10000):
-            not_found("lbl_NomeArq")
-        bot.click_relative(69, 14)
-
-        # Salvando o nome do arquivo com números randomicamente
-        valor_randomico = randint(1000, 9999)
-        arquivo = rf"C:\temp\darfs\NF_{valor_randomico}.pdf"
-        bot.paste(arquivo)
-        print(f"")
-        print(f"NF gerada: {arquivo}")
-        
-        if not bot.find( "btn_salvar", matching=0.97, waiting_time=10000):
-            not_found("btn_salvar")
-        bot.click()
-
-        bot.wait(1000)
+                # print(f'The last saved mouse position is: {xx}, {yy}')
 
 
-        # Aqui fechamos a primeira janela e depois fechamos o sicalc ( Clicar nas teclas Alt+F4)
-        bot.alt_f4()
-        #bot.alt_f4()
  
-###
+        # capturando a imagem com o valor da ação
+        #img = bot.screen_cut(x, y, l, p)
+        img = bot.screen_cut(x, y, width=40, height=20)
+        img.save("cotacao.png")
+
+ 
+        # Convertendo a imagem em texto
+        imagem = cv2.imread("cotacao.png")
+        caminho = r"C:\Program Files\Tesseract-OCR"
+        pytesseract.pytesseract.tesseract_cmd = caminho + r'\tesseract.exe'
+        cotacao = pytesseract.image_to_string(imagem)
+
+        # Cotação da açao
+        print()
+        print("COTAÇÃO")
+        print()
+        print(f'{acao1}    R$ {cotacao}')
+        print(f'{acao2}    R$ {cotacao}')
+         
+
+        if  cotacao <= acao1_valor_compra:
+            #bot.execute(dir_exec_app)
+            print(f'{acao1} A cotação esta dentro do valor esperado para a compra:  R$ {acao1_valor_compra}')
+            print(f'{acao1} ------- COMPRAR -------')
+            print()
+        if  cotacao >= acao1_valor_venda:
+            #bot.execute(dir_exec_app)
+            print(f'{acao1} A cotação esta dentro do valor esperado para a venda:  R$ {acao1_valor_venda}')
+            print(f'{acao1} ------- VENDER -------')
+            print()
+   
+        # # Criar um for e um while
+
+        # if  cotacao <= acao2_valor_compra:
+        #     #bot.execute(dir_exec_app)
+        #     print(f'{acao2} A cotação esta dentro do valor esperado para a compra:  R$ {acao2_valor_compra}')
+        #     print(f'{acao2} ------- COMPRAR -------')
+        #     print()
+        # if  cotacao >= acao2_valor_venda:
+        #     #bot.execute(dir_exec_app)
+        #     print(f'{acao2} A cotação esta dentro do valor esperado para a venda:  R$ {acao2_valor_venda}')
+        #     print(f'{acao2} ------- VENDER -------')
+        #     print()
+
+
+
+                # coord_elemento = bot.get_element_coords(label="Petr4-click", x="", y="" ,width="", height="", matching=0.97)
+                # print(f'--coordenadas da imagem Petr4-click.png: {coord_elemento}')
+                
+
+###################################################################################################
+
     except Exception as e:
-        print(f" --- !!! Erro: "+ e)
+        # Handles the exception
+        print(f"##########################################################################################################################")
+        print(f"An error occurred: {e}")
+        print(f"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        # Log the exception to Rollbar
+     
     finally:
         if not app_windows_process is None:
             # Encerra o App
             bot.terminate_process(app_windows_process)
-            print(f"")
-            print(f"------------ F I M ------------")   
-###
-    
-
+            print(f"------------ F I M ------------") 
+            
+###################################################################################################
 
 def not_found(label):
     print(f"Element not found: {label}")
@@ -150,3 +152,5 @@ def not_found(label):
 
 if __name__ == '__main__':
     main()
+
+
